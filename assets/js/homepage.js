@@ -9,12 +9,21 @@ var getUserRepos = function(user) {
     // format the github api url
     var apiUrl = "https://api.github.com/users/" + user + "/repos";
     
-    fetch(apiUrl).then(function(response) {
-        response.json().then(function(data) {
-            displayRepos(data, user);
-        });
+    fetch(apiUrl)
+        .then(function(response) {
+            // request was succesful
+            if (response.ok) {
+                response.json().then(function(data) {
+                    displayRepos(data, user);
+                });
+            } else {
+                alert("Error: " + response.status);
+            }
+        })
+    .catch(function(error) {
+        // notice this ".catch()" getting chained onto the end of the ".then()"
+        alert("Unable to connect to GitHub");
     });
-    
 };
 
 var formSubmitHandler = function(event) {
@@ -72,5 +81,10 @@ var displayRepos = function(repos, searchTerm) {
     
         // append container to the dom
         repoContainerEl.appendChild(repoEl);
+    }
+    // check if api returned any repos
+    if (repos.length === 0) {
+        repoContainerEl.textContent = "No repositories found.";
+        return;
     }
 }
